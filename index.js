@@ -1,5 +1,6 @@
 const fs = require("fs");
 const inquirer = require("inquirer");
+const Employee = require("./lib/Employee");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
 const Manager = require("./lib/Manager");
@@ -66,14 +67,14 @@ const askForInfo = () => {
       // }
     });
 };
-const menu = (dataObj) => {
+const menu = () => {
   return inquirer
     .prompt([
       {
         type: "list",
         message:
           "Would you like to add an engineer/intern or finish building your team?",
-        name: "addEngineerOrIntern",
+        name: "employee",
         choices: ["Engineer", "Intern", "Finish Team"],
       },
       {
@@ -123,68 +124,85 @@ const menu = (dataObj) => {
       },
     ])
     .then((menuData) => {
-      if (menuData.addEngineerOrIntern === "Engineer") {
-        return addEngineer(dataObj);
-      } else if (menuData.addEngineerOrIntern === "Intern") {
-        return addIntern(dataObj);
-      } else {
-        return dataObj;
+      if (menuData.employee === "Engineer") {
+        const newEmployee = new Engineer(
+          menuData.name,
+          menuData.ID,
+          menuData.email,
+          menuData.github
+        );
+        roster.push(newEmployee);
+      } else if (menuData.employee === "Intern") {
+        const newEmployee = new Intern(
+          menuData.name,
+          menuData.ID,
+          menuData.email,
+          menuData.school
+        );
+        roster.push(newEmployee);
       }
+      if (menuData.addEmployee === "Yes") return menu();
+      else if (menuData.addEmployee === "No") return roster;
+
+      const writeFile = (data) => {
+        console.log(data);
+        fs.writeFile("./lib/TeamProfile.html", data, (error) =>
+          error ? console.log(error) : console.log("You created your team")
+        );
+      };
+      const addEngineer = (objectData) => {
+        return inquirer
+          .prompt([
+            {
+              type: "input",
+              name: "engineerName",
+              message: "What is your engineers name?",
+            },
+            {
+              type: "input",
+              name: "engineerId",
+              message: "What is your engineers ID?",
+              validate: (engineerId) => {
+                engineerId = parseInt(engineerId);
+                if (Number.isInteger(engineerId)) {
+                  return true;
+                } else {
+                  console.log("Enter a valid number.");
+                  return false;
+                }
+              },
+            },
+            {
+              type: "input",
+              name: "engineerEmail",
+              message: "Enter your email",
+            },
+            {
+              type: "input",
+              name: "engineerGithub",
+              message: "Enter your Github",
+            },
+          ])
+          .then((engineerData) => {
+            const { engineerName, engineerId, engineerEmail, engineerGithub } =
+              engineerData;
+            const engineerClass = new Engineer(
+              engineerName,
+              engineerId,
+              engineerEmail,
+              engineerGithub
+            );
+            objectData.roster.push(engineerClass);
+            return menu(objectData);
+          });
+      };
+
+      askForInfo()
+        .then(menu)
+        .then((roster) => rosterPage(roster))
+        .then((pageHTML) => writeFile(pageHTML))
+        .then((writeFileResponse) => {
+          console.log(writeFileResponse);
+        });
     });
 };
-
-const addEngineer = (objectData) => {
-  return inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "engineerName",
-        message: "What is your engineers name?",
-      },
-      {
-        type: "input",
-        name: "engineerId",
-        message: "What is your engineers ID?",
-        validate: (engineerId) => {
-          engineerId = parseInt(engineerId);
-          if (Number.isInteger(engineerId)) {
-            return true;
-          } else {
-            console.log("Enter a valid number.");
-            return false;
-          }
-        },
-      },
-      {
-        type: "input",
-        name: "engineerEmail",
-        message: "Enter your email",
-      },
-      {
-        type: "input",
-        name: "engineerGithub",
-        message: "Enter your Github",
-      },
-    ])
-    .then((engineerData) => {
-      const { engineerName, engineerId, engineerEmail, engineerGithub } =
-        engineerData;
-      const engineerClass = new Engineer(
-        engineerName,
-        engineerId,
-        engineerEmail,
-        engineerGithub
-      );
-      objectData.roster.push(engineerClass);
-      return menu(objectData);
-    });
-};
-
-askForInfo()
-  .then(menu)
-  .then((finishData) => {
-    const rosterHTML = rosterPage(finishData);
-    fs.writeFile("TeamProfile.html", rosterHTML, (error) =>
-      error ? console.log(error) : console.log("Congrats! You made a readMe!")
-    );
-  });
