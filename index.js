@@ -37,15 +37,15 @@ const askForInfo = () => {
     ])
     .then((managerData) => {
       console.log(managerData);
-      // const manager = new Manager(
-      //   managerData.managerName,
-      //   managerData.managerId,
-      //   managerData.managerEmail,
-      //   managerData.officeNumber
-      //   );
+      const manager = new Manager(
+        managerData.managerName,
+        managerData.managerId,
+        managerData.managerEmail,
+        managerData.officeNumber
+      );
+      manager.specialThing = manager.officeNumber;
       managerData.roster = [];
-      return managerData;
-      // roster.push(manager);
+      roster.push(manager);
     });
   // let boat = new Engineer
   // // making a new object from the lib classes
@@ -133,6 +133,7 @@ const menu = () => {
           menuData.email,
           menuData.github
         );
+        newEmployee.specialThing = menuData.github;
         roster.push(newEmployee);
       } else if (menuData.employee === "Intern") {
         const newEmployee = new Intern(
@@ -141,6 +142,7 @@ const menu = () => {
           menuData.email,
           menuData.school
         );
+        newEmployee.specialThing = menuData.school;
         roster.push(newEmployee);
       }
       if (menuData.addEmployee === "Yes") return menu();
@@ -212,6 +214,7 @@ const addEngineer = (objectData) => {
 askForInfo()
   .then(menu)
   .then((finishedData) => {
+    console.log(finishedData);
     const rosterHTML = rosterPage(finishedData);
     fs.writeFile("./dist/TeamProfile.html", rosterHTML, (err) => {
       if (err) throw err;

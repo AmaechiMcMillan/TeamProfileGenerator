@@ -4,14 +4,17 @@ const Intern = require("../lib/Intern");
 const rosterPage = require("../lib/TeamProfile");
 
 const teamPage = (rosterData) => {
-  const { managerName, managerId, managerEmail, managerOfficeNumber } =
-    rosterData;
-  const newManager = new Manager(
-    managerName,
-    managerId,
-    managerEmail,
-    managerOfficeNumber
-  );
+  // const { managerName, managerId, managerEmail, managerOfficeNumber } =
+  //   rosterData;
+  // const newManager = new Manager(
+  //   managerName,
+  //   managerId,
+  //   managerEmail,
+  //   managerOfficeNumber
+  // );
+  // for (let index = 0; index < array.length; index++) {
+
+  // }
   return `
     <!DOCTYPE html>
   <html lang=en>
@@ -27,38 +30,36 @@ const teamPage = (rosterData) => {
     <div class="card-container">
       <div class="card">
         <div class="card-title">
-          <h3>${newManager.getName()}</h3>
-          <h3><i class="fa-solid fa-person"></i>${newManager.getRole()}</h3>
+          <h3>${rosterData[0].getName()}</h3>
+          <h3><i class="fa-solid fa-person"></i>${rosterData[0].getRole()}</h3>
         </div>
-        <div class="attribute">Office number: <a href="tel:${newManager.getOfficeNumber()}">${newManager.getOfficeNumber()}</a></div>
+        <div class="attribute">Office number: <a href="tel:${rosterData[0].getOfficeNumber()}">${rosterData[0].getOfficeNumber()}</a></div>
       </div>
       
       
-      ${rosterData.roster
-        .forEach(function (classes) {
-          if (classes.getRole() === "Engineer") {
-            return `
+      ${rosterData.forEach(function (classes) {
+        if (classes.getRole() === "Engineer") {
+          return `
             <div class="card-container">
       <div class="card">
         <div class="card-title">
-          <h3>${classes.getName()}</h3>
+          <h3>${rosterData[0].getName()}</h3>
           <h3><i class="fa-solid fa-person"></i>${classes.getRole()}</h3>
         </div>
         <div class="attribute">Office number: <a href="tel:${classes.getGithub()}">${classes.getGithub()}</a></div>
       </div>`;
-          } else {
-            return `<div class="card">
+        } else if (classes.getRole() === "Intern") {
+          return `<div class="card">
           <div class="card-title">
             <h3>${classes.getName()}</h3>
             <h3><i class="fa-brands fa-dev"></i>${classes.getRole()}</h3>
           </div>
           <div class="attribute">ID: ${classes.getId()}</div>
           <div class="attribute">Email: <a href="mailTo:${classes.getEmail()}">${classes.getEmail()}</a></div>
-          <div class="attribute">GitHub account: <a href="https://github.com/${classes.getGithub()}" target="_blank">${classes.getGithub()}</a></div>
+          <div class="attribute">GitHub account: <a href="https://github.com/${classes.getSchool()}" target="_blank">${classes.getSchool()}</a></div>
           </div>`;
-          }
-        })
-        .join("")}
+        }
+      })}
     </div>
     </body>
     </html>`;
